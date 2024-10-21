@@ -9,6 +9,7 @@ DB_NAME=os.environ.get("DB_NAME")
 DB_USER=os.environ.get("DB_USER")
 DB_PASS=os.environ.get("DB_PASS")
 SECRET_FOR_TOKEN=os.environ.get("SECRET_FOR_TOKEN")
+BOT_TOKEN=os.environ.get("BOT_TOKEN")
 
 
 SMTP_HOST=os.environ.get("SMTP_HOST")

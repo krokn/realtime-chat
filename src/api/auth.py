@@ -12,6 +12,8 @@ router = APIRouter(
     tags=['Auth']
 )
 
+SECONDS_PER_SAVE_IN_REDIS = 120 * 60
+
 
 @router.post('/register')
 async def register(user: UserSchemaForAdd):
@@ -19,7 +21,8 @@ async def register(user: UserSchemaForAdd):
     hash_password = Encryption.hash(user.password)
     user_model = UserModel(
         username=user.username,
-        password=hash_password
+        password=hash_password,
+        telegram_id=user.telegram_id
     )
     await UserRepository().add(user_model)
     return 'success'
@@ -29,13 +32,15 @@ async def register(user: UserSchemaForAdd):
 async def login(user: UserSchemaForAdd):
     logger.info(f'username = {user.username}, password = {user.password}')
     user_db = await UserRepository().get(user.username)
+
     if user_db is None:
         raise HTTPException(status_code=404, detail="user not found")
 
     if Encryption.hash(user.password) != user_db.password:
         raise HTTPException(status_code=405, detail="password incorrect")
-    token = Encryption.create_token(user_db.id)
-    await redis_client.set(token, user_db.id, ex=120 * 60)
+
+    token = Encryption.create_token(user_db.username)
+    await redis_client.set(token, user_db.username, ex=SECONDS_PER_SAVE_IN_REDIS)
     logger.info(f'token = {token}')
     response = {
         'token': token

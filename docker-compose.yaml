@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
     ports:
-      - "${DB_PORT}:5432"
+      - "1221:5432"
     networks:
       - my_network
     volumes:
@@ -34,7 +34,19 @@ services:
       - "6379:6379"
     networks:
       - my_network
-#
+
+  telegram_bot:
+    container_name: telegram_bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python src/services/telegram_bot.py
+    networks:
+      - my_network
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+
+
 #  celery:
 #    container_name: celery_cipher
 #    build:
@@ -60,6 +72,7 @@ services:
 #      - fastapi
 #    networks:
 #      - my_network
+
 
 networks:
   my_network:
