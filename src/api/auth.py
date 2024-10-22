@@ -14,12 +14,55 @@ router = APIRouter(
 )
 
 
-@router.post('/register')
+@router.post(
+    '/register',
+    summary="Регистрация нового пользователя",
+    description=(
+        "Этот endpoint позволяет зарегистрировать нового пользователя, предоставив "
+        "имя пользователя, пароль и Telegram ID. После успешной регистрации, "
+        "пользователь будет добавлен в базу данных."
+    ),
+    response_description="Успешная регистрация пользователя"
+)
 async def register(user: UserSchemaForAdd):
     return await AuthService.register(user)
 
 
-@router.post('/login')
+@router.post(
+    '/login',
+    summary="Авторизация пользователя",
+    description=(
+        "Этот endpoint выполняет авторизацию пользователя по предоставленным имени пользователя и паролю. "
+        "После успешной авторизации возвращает токен, который можно использовать для доступа к чату."
+    ),
+    response_description="Успешная авторизация и возврат токена",
+    responses={
+        200: {
+            "description": "Успешная авторизация",
+            "content": {
+                "application/json": {
+                    "example": {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
+                }
+            },
+        },
+        404: {
+            "description": "Пользователь не найден",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "user not found"}
+                }
+            },
+        },
+        405: {
+            "description": "Неверный пароль",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "password incorrect"}
+                }
+            },
+        },
+    }
+)
 async def login(user: UserSchemaForLogin):
     return await AuthService.login(user)
 

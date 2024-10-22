@@ -2,7 +2,6 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from loguru import logger
 from starlette.responses import JSONResponse
 
-from src.business_logic.message import Message
 from src.repository.message import MessageRepository
 from src.repository.user import UserRepository
 from src.services.redis import redis_client
@@ -39,8 +38,70 @@ async def websocket_endpoint(websocket: WebSocket, token: str):
         await ws_manager.disconnect(sender)
 
 
-@router.get('/correspondence')
-async def get_correspondence(first_username: str, second_username):
+@router.get(
+    "/ws-info",
+    summary="Информация о WebSocket подключении для обмена сообщениями",
+    description=(
+        "Этот WebSocket эндпоинт (`/ws`) позволяет пользователям отправлять сообщения друг другу в реальном времени. "
+        "Соединение открывается с помощью токена авторизации, который должен быть передан как параметр. После подключения "
+        "пользователь может отправлять сообщения в формате `получатель|сообщение`, и сервер отправит сообщение указанному "
+        "пользователю, если он подключен."
+    ),
+    response_description="Информация о WebSocket соединении",
+    tags=["WebSocket"]
+)
+async def ws_info():
+    return JSONResponse(content={
+        "detail": "WebSocket соединение осуществляется по адресу `/ws`.",
+        "connection": "Передайте токен авторизации в качестве параметра в WebSocket соединении.",
+        "usage": "После подключения отправляйте сообщения в формате `получатель|сообщение`."
+    })
+
+
+@router.get(
+    '/correspondence',
+    summary="Получение переписки между пользователями",
+    description=(
+        "Этот endpoint позволяет получить всю историю переписки между двумя пользователями, "
+        "указанными по их именам пользователя. История сообщений возвращается в формате списка объектов."
+    ),
+    response_description="История переписки в формате JSON",
+    responses={
+        200: {
+            "description": "Успешное получение переписки",
+            "content": {
+                "application/json": {
+                    "example": [
+                        {
+                            "id": 1,
+                            "sender_id": 123,
+                            "receiver_id": 456,
+                            "message": "Привет!",
+                            "timestamp": "2024-10-22T10:00:00Z"
+                        },
+                        {
+                            "id": 2,
+                            "sender_id": 456,
+                            "receiver_id": 123,
+                            "message": "Привет, как дела?",
+                            "timestamp": "2024-10-22T10:05:00Z"
+                        }
+                    ]
+                }
+            },
+        },
+        404: {
+            "description": "Один из пользователей не найден",
+            "content": {
+                "application/json": {
+                    "example": {"detail": "user not found"}
+                }
+            },
+        },
+    },
+    tags=["Переписка"]
+)
+async def get_correspondence(first_username: str, second_username: str):
     first_user = await UserRepository().get(first_username)
     second_user = await UserRepository().get(second_username)
     messages = await MessageRepository().get_all(first_user.id, second_user.id)

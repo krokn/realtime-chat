@@ -11,8 +11,8 @@ from src.services.redis import redis_client
 SECONDS_PER_SAVE_IN_REDIS = 120 * 60
 
 
-
 class AuthService:
+
     @staticmethod
     async def register(user_data):
         hash_password = Encryption.hash(user_data.password)
