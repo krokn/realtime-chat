@@ -24,3 +24,12 @@ class MessageModel(Base):
     receiver_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     content: Mapped[str] = mapped_column()
     timestamp: Mapped[datetime] = mapped_column(server_default=func.now())
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "sender_id": self.sender_id,
+            "receiver_id": self.receiver_id,
+            "content": self.content,
+            "timestamp": self.timestamp.isoformat()  # Convert datetime to a string
+        }

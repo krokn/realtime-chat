@@ -6,20 +6,21 @@ from src.database.models import UserModel
 
 
 class UserRepository:
-    def __init__(self, user_model: UserModel):
-        self.obj = user_model
+    def __init__(self):
+        self.model = UserModel
 
-    async def add(self):
+    @staticmethod
+    async def add(user: UserModel):
         async with get_async_session() as session:
-            session.add(self.obj)
+            session.add(user)
             await session.flush()
-            user_id = self.obj.id
+            user_id = user
             await session.commit()
             return user_id
 
     async def get(self, username: str):
         async with get_async_session() as session:
-            query = select(UserModel).where(UserModel.username == username)
+            query = select(self.model).where(self.model.username == username)
             result = await session.execute(query)
             return result.scalar_one_or_none()
 
