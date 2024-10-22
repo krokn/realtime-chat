@@ -1,22 +1,23 @@
-from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from src.database.connection import get_async_session
 from src.database.models import UserModel
 
 
 class UserRepository:
+    def __init__(self, user_model: UserModel):
+        self.obj = user_model
 
-    @staticmethod
-    async def add(user: UserModel):
+    async def add(self):
         async with get_async_session() as session:
-            session.add(user)
+            session.add(self.obj)
             await session.flush()
-            user_id = user.id
+            user_id = self.obj.id
             await session.commit()
             return user_id
 
-    @staticmethod
-    async def get(username: str):
+    async def get(self, username: str):
         async with get_async_session() as session:
             query = select(UserModel).where(UserModel.username == username)
             result = await session.execute(query)

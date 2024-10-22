@@ -4,7 +4,7 @@ from loguru import logger
 from src.business_logic.auth import AuthService
 from src.database.models import UserModel
 from src.repository.user import UserRepository
-from src.schemas.user import UserSchemaForAdd
+from src.schemas.user import UserSchemaForAdd, UserSchemaForLogin
 from src.services.encryption import Encryption
 from src.services.redis import RedisClient, redis_client
 
@@ -20,7 +20,7 @@ async def register(user: UserSchemaForAdd):
 
 
 @router.post('/login')
-async def login(user: UserSchemaForAdd):
+async def login(user: UserSchemaForLogin):
     return await AuthService.login(user)
 
 

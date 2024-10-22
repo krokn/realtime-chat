@@ -12,6 +12,7 @@ router = APIRouter(
 
 ws_manager = WebSocketManager()
 
+
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, token: str):
     user = await redis_client.get(token)

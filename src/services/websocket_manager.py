@@ -1,7 +1,7 @@
 from loguru import logger
 from starlette.websockets import WebSocket
 
-from src.services.celery import send_notification_celery
+from src.services.celery import send_notification_celery, save_message
 from src.services.redis import redis_client
 
 
@@ -26,6 +26,7 @@ class WebSocketManager:
         # Проверяем, существует ли получатель в активных соединениях
         recipient_ws = self.active_connections.get(recipient)
         if recipient_ws:
+            save_message.delay(sender, recipient, message)
             await recipient_ws.send_text(f"{sender}: {message}")  # Отправляем сообщение получателю в реальном времени
             logger.info(f"Сообщение от {sender} к {recipient}: {message}")
         else:
