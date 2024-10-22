@@ -46,20 +46,17 @@ services:
     environment:
       BOT_TOKEN: ${BOT_TOKEN}
 
-
-#  celery:
-#    container_name: celery_cipher
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    command: celery -A src.services.Celery worker --loglevel=info
-#    depends_on:
-#      - redis
-#      - postgres
-#    networks:
-#      - my_network
-#    volumes:
-#      - logs:/app/logs
+  celery:
+    container_name: celery_cipher
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A src.services.celery worker --loglevel=info
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - my_network
 
 #  nginx:
 #    image: nginx:latest

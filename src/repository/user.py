@@ -21,3 +21,9 @@ class UserRepository:
             query = select(UserModel).where(UserModel.username == username)
             result = await session.execute(query)
             return result.scalar_one_or_none()
+
+    @staticmethod
+    def get_for_celery(username: str, session):
+        query = select(UserModel).where(UserModel.username == username)
+        result = session.execute(query)
+        return result.scalar_one_or_none()

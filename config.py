@@ -10,6 +10,8 @@ DB_USER=os.environ.get("DB_USER")
 DB_PASS=os.environ.get("DB_PASS")
 SECRET_FOR_TOKEN=os.environ.get("SECRET_FOR_TOKEN")
 BOT_TOKEN=os.environ.get("BOT_TOKEN")
+SECONDS_PER_SAVE_IN_REDIS=os.environ.get("SECONDS_PER_SAVE_IN_REDIS")
+
 
 
 SMTP_HOST=os.environ.get("SMTP_HOST")
