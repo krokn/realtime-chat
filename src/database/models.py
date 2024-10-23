@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import ForeignKey, func, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.database.connection import Base
@@ -12,7 +12,7 @@ class UserModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str] = mapped_column()
-    telegram_id: Mapped[int] = mapped_column(unique=True)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
 
 
 class MessageModel(Base):
