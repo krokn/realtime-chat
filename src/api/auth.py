@@ -1,12 +1,7 @@
-from fastapi import APIRouter, HTTPException
-from loguru import logger
+from fastapi import APIRouter
 
 from src.business_logic.auth import AuthService
-from src.database.models import UserModel
-from src.repository.user import UserRepository
 from src.schemas.user import UserSchemaForAdd, UserSchemaForLogin
-from src.services.encryption import Encryption
-from src.services.redis import RedisClient, redis_client
 
 router = APIRouter(
     prefix='/api/auth',

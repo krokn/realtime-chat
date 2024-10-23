@@ -5,7 +5,7 @@ from starlette.responses import JSONResponse
 from src.repository.message import MessageRepository
 from src.repository.user import UserRepository
 from src.services.redis import redis_client
-from src.services.websocket_manager import WebSocketManager
+from src.business_logic.websocket_manager import WebSocketManager
 
 router = APIRouter(
     prefix='/api/message',

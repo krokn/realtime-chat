@@ -2,10 +2,9 @@ from fastapi import HTTPException
 from loguru import logger
 
 from src.business_logic.user import User
-from src.database.models import UserModel
 from src.repository.user import UserRepository
 from src.schemas.user import UserSchemaForAdd
-from src.services.encryption import Encryption
+from src.business_logic.encryption import Encryption
 from src.services.redis import redis_client
 
 SECONDS_PER_SAVE_IN_REDIS = 120 * 60
@@ -16,7 +15,7 @@ class AuthService:
     @staticmethod
     async def register(user_data):
         hash_password = Encryption.hash(user_data.password)
-        user_model = await User().create_user_model(UserSchemaForAdd, hash_password)
+        user_model = await User().create_user_model(user_data, hash_password)
         repository = UserRepository()
         await repository.add(user_model)
         return 'user registered success'
