@@ -5,7 +5,7 @@
 
 ## Технологии
 - **Backend**: FastAPI (Python 3.12)
-- **Database**: Postgre 16, Redis
+- **Database**: Postgres 16, Redis
 - **ORM**: SQLAlchemy, Alembic (для миграций)
 - **WebSockets**: Для обмена сообщениями в реальном времени
 - **Celery**: Для обработки фоновых задач (уведомления через Telegram, сохранение сообщений)
@@ -39,31 +39,41 @@
    ```bash
    git clone https://github.com/krokn/realtime-chat
 
-2. Создание Виртуального Окружения:
+2. В корне проекта создать файл .env пример:
+   ```bash
+   DB_HOST=postgres
+   DB_PORT=5432
+   DB_NAME=postgres
+   DB_USER=user
+   DB_PASS=123
+   BOT_TOKEN=токен телеграмм бота
+   ```
+
+3. Создание Виртуального Окружения:
     ```bash
     python -m venv venv
 
-3. Активация Виртуального Окружения CMD:
+4. Активация Виртуального Окружения CMD:
     ```bash
     venv\Scripts\activate.bat
 
-4. Активация Виртуального Окружения PowerShell:
+5. Активация Виртуального Окружения PowerShell:
     ```bash
     .\venv\Scripts\Activate.ps1
    
-5. Запуск docker-compose файла:
+6. Запуск docker-compose файла:
     ```bash
     docker-compose up --build -d
    
-6. Поиск ID контейнера FastAPI для проведения миграции (ID нужно скопировать)
+7. Поиск ID контейнера FastAPI для проведения миграции (ID нужно скопировать)
     ```bash
     docker ps
    
-7. Проваливаемся в контейнер FastAPI
+8. Проваливаемся в контейнер FastAPI
     ```bash
     docker exec -it id контейнера fastapi bash
 
-8. Запускаем миграции alembic
+9. Запускаем миграции alembic
    ```bash
     alembic upgrade head
     exit

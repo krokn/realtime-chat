@@ -48,7 +48,6 @@ async def websocket_endpoint(websocket: WebSocket, token: str):
         "пользователю, если он подключен."
     ),
     response_description="Информация о WebSocket соединении",
-    tags=["WebSocket"]
 )
 async def ws_info():
     return JSONResponse(content={
@@ -99,7 +98,6 @@ async def ws_info():
             },
         },
     },
-    tags=["Переписка"]
 )
 async def get_correspondence(first_username: str, second_username: str):
     first_user = await UserRepository().get(first_username)

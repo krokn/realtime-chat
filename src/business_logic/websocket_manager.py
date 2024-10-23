@@ -25,10 +25,12 @@ class WebSocketManager:
     async def send_message_user(self, recipient: str, message: str, sender: str):
         # Проверяем, существует ли получатель в активных соединениях
         recipient_ws = self.active_connections.get(recipient)
+        logger.info(f"Сообщение от {sender} к {recipient}: {message}")
+        save_message.delay(sender, recipient, message)
         if recipient_ws:
-            save_message.delay(sender, recipient, message)
+            logger.info(f'{recipient} is online')
             await recipient_ws.send_text(f"{sender}: {message}")  # Отправляем сообщение получателю в реальном времени
-            logger.info(f"Сообщение от {sender} к {recipient}: {message}")
         else:
+            logger.info(f'{recipient} is offline')
             send_notification_celery.delay(recipient, f'{sender}: {message}') # Отправляем уведомление в телеграм
 

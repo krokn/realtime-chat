@@ -43,8 +43,6 @@ services:
     command: python src/services/telegram_bot.py
     networks:
       - my_network
-    environment:
-      BOT_TOKEN: ${BOT_TOKEN}
 
   celery:
     container_name: celery

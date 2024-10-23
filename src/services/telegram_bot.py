@@ -2,7 +2,6 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Command
 import asyncio
-
 from loguru import logger
 
 BOT_TOKEN = '7756693894:AAFB0mLHh9vJOaem9XnAI8yOQkzR-zYuLj0'

@@ -13,7 +13,6 @@ class UserModel(Base):
     username: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str] = mapped_column()
     telegram_id: Mapped[int] = mapped_column(unique=True)
-    is_online: Mapped[bool] = mapped_column(default=False)
 
 
 class MessageModel(Base):
@@ -31,5 +30,5 @@ class MessageModel(Base):
             "sender_id": self.sender_id,
             "receiver_id": self.receiver_id,
             "content": self.content,
-            "timestamp": self.timestamp.isoformat()  # Convert datetime to a string
+            "timestamp": self.timestamp.isoformat()
         }
