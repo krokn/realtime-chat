@@ -12,6 +12,7 @@ services:
       - my_network
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    restart: always
 
   fastapi:
     container_name: fastapi
@@ -26,6 +27,7 @@ services:
       - redis
     networks:
       - my_network
+    restart: always
 
   redis:
     container_name: redis
@@ -34,6 +36,7 @@ services:
       - "6379:6379"
     networks:
       - my_network
+    restart: always
 
   telegram_bot:
     container_name: telegram_bot
@@ -43,6 +46,7 @@ services:
     command: python src/services/telegram_bot.py
     networks:
       - my_network
+    restart: always
 
   celery:
     container_name: celery
@@ -55,6 +59,7 @@ services:
       - postgres
     networks:
       - my_network
+    restart: always
 
   nginx:
     image: nginx:latest
@@ -67,6 +72,7 @@ services:
       - fastapi
     networks:
       - my_network
+    restart: always
 
 
 networks:
