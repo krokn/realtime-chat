@@ -11,31 +11,45 @@ class WebSocketManager:
         self.active_connections: dict[str, WebSocket] = {}  # Храним активные соединения WebSocket
 
     async def connect(self, websocket: WebSocket, sender: str):
-        sender = sender.lower().strip()  # Нормализуем имя пользователя
+        # Если уже есть подключение для этого пользователя, отключаем его
+        if sender in self.active_connections:
+            logger.warning(f"Пользователь {sender} уже подключен. Переподключение...")
+            await self.disconnect(sender)
+
         await websocket.accept()
-        self.active_connections[sender] = websocket  # Храним соединение WebSocket
+        self.active_connections[sender] = websocket  # Сохраняем новое подключение
         await redis_client.set(f"{self.redis_prefix}{sender}", "connected")
         logger.info(f'Пользователь {sender} подключен.')
-        logger.info(f"Активные соединения после подключения {sender}: {self.active_connections.keys()}")
+        logger.info(f"Активные соединения после подключения {sender}: {list(self.active_connections.keys())}")
 
     async def disconnect(self, sender: str):
-        sender = sender.lower().strip()  # Нормализуем имя пользователя
-        await redis_client.delete(f"{self.redis_prefix}{sender}")
+        # Проверяем, есть ли это соединение перед удалением
         if sender in self.active_connections:
-            del self.active_connections[sender]  # Удаляем соединение WebSocket
-        logger.info(f'Пользователь {sender} отключен.')
-        logger.info(f"Активные соединения после отключения {sender}: {self.active_connections.keys()}")
+            await self.active_connections[sender].close()  # Закрываем WebSocket
+            del self.active_connections[sender]  # Удаляем соединение из активных
+            await redis_client.delete(f"{self.redis_prefix}{sender}")
+            logger.info(f'Пользователь {sender} отключен.')
+        else:
+            logger.warning(f'Попытка отключить {sender}, но его нет среди активных соединений.')
+
+        logger.info(f"Активные соединения после отключения {sender}: {list(self.active_connections.keys())}")
 
     async def send_message_user(self, recipient: str, message: str, sender: str):
-        recipient = recipient.lower().strip()  # Нормализуем имя получателя
-        sender = sender.lower().strip()  # Нормализуем имя отправителя
+        # Проверяем наличие соединения с получателем
         recipient_ws = self.active_connections.get(recipient)
         logger.info(f"Сообщение от {sender} к {recipient}: {message}")
+
+        # Сохраняем сообщение через Celery
         save_message.delay(sender, recipient, message)
-        logger.info(f"Активные соединения: {self.active_connections.keys()}")
+
         if recipient_ws:
             logger.info(f'{recipient} is online')
-            await recipient_ws.send_text(f"{sender}: {message}")  # Отправляем сообщение получателю в реальном времени
+            try:
+                await recipient_ws.send_text(f"{sender}: {message}")  # Отправляем сообщение получателю
+            except Exception as e:
+                logger.error(f"Ошибка отправки сообщения пользователю {recipient}: {e}")
         else:
-            logger.info(f'{recipient} is offline')
+            logger.info(f'{recipient} is offline, отправляем уведомление через Telegram')
             send_notification_celery.delay(recipient, f'{sender}: {message}')
+
+        logger.info(f"Активные соединения после отправки сообщения: {list(self.active_connections.keys())}")
