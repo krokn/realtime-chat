@@ -14,6 +14,12 @@ class UserModel(Base):
     password: Mapped[str] = mapped_column()
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True)
 
+    def to_dict(self):
+        return {
+            "username": self.username,
+        }
+
+
 
 class MessageModel(Base):
     __tablename__ = 'messages'

@@ -1,3 +1,5 @@
+from django.db.models.expressions import result
+from dns.e164 import query
 from loguru import logger
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -34,6 +36,17 @@ class UserRepository:
                 return result.scalar_one_or_none()  # Вернуть одного пользователя или None, если не найден
         except SQLAlchemyError as e:
             logger.error(f"Ошибка при получении пользователя с именем '{username}': {e}")
+            raise e
+
+
+    async def get_all(self):
+        try:
+            async with get_async_session() as session:
+                query = select(self.model)
+                result = await session.execute(query)
+                return result.scalars().all()
+        except SQLAlchemyError as e:
+            logger.error(f"Ошибка при получении всех пользователей: {e}")
             raise e
 
     @staticmethod
